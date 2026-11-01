@@ -1,13 +1,16 @@
 # Picker Relay
 
-A Chrome extension + local watcher that turns "point at any element on any
-webpage and type a note" into a compiled feedback package: element selector,
-text, your note, and an auto-cropped screenshot of exactly the element you
-picked, delivered in one click.
+![Picker Relay](docs/banner.png)
 
-Built for agent-assisted workflows (the relay hands feedback to your local AI
-assistant), but works for any team: picks land as files + images on your own
-machine, and a notify hook of your choice decides where they go.
+**Point at any webpage element, type a note, and your AI assistant gets a compiled feedback package: element selector, element text, your note, and an auto-cropped screenshot of exactly what you picked.**
+
+No copy-pasting DOM paths. No "the button on the left, under the thing." One click per element, one file at the end.
+
+## Built for agent-assisted workflows
+
+Picker Relay was built for [Hermes Agent](https://hermes-agent.nousresearch.com): you browse, you pick, you type a note, and your agent receives everything it needs to act, delivered as plain files on your own machine. No cloud round-trip, no browser-in-the-loop gymnastics.
+
+It works just as well for any team. Picks land as JSON + PNGs locally, and a notify hook of your choice decides where they go: a Discord or Slack webhook, a desktop notification, an email script, or the CLI of your AI agent.
 
 ## What it does
 
@@ -15,10 +18,12 @@ machine, and a notify hook of your choice decides where they go.
 - Click any element -> type a note -> Enter. Wrong element? Just click another one, the note is kept
 - Screenshots are captured at pick time and cropped to the element (DPR-aware)
 - A panel lists all picks with thumbnail previews (click to zoom), per-item remove
-- One click on **Send** compiles everything and drops it as a JSON file on disk
+- One click on **Send** compiles everything into a single JSON file on disk
 - A local watcher process picks it up, saves the screenshots, and calls your notify hook
 
 Nothing ever leaves your machine except through the notify command you configure.
+
+![How Picker Relay works](docs/flow.png)
 
 ## Install (extension)
 
@@ -35,6 +40,8 @@ is the way. Chrome for Testing / Chromium builds honor both.
 python3 relay.py                       # defaults: watch ~/Downloads/picker-relay
 ```
 
+The watcher is stdlib-only Python 3. No dependencies, no install step.
+
 Configure with environment variables:
 
 ```bash
@@ -45,9 +52,8 @@ export PICKER_NOTIFY_CMD='curl -s -X POST -H "Content-Type: application/json" \
 ```
 
 `PICKER_NOTIFY_CMD` gets `%f` (path to the compiled message text) and `%m`
-(space-separated PNG paths). Examples: a Discord/Slack webhook via curl, a
-`notify-send`/`osascript` desktop notification, an email script, or the CLI of
-your AI agent.
+(space-separated PNG paths). Point it at your agent's CLI and every pick session
+arrives as a ready-to-read briefing.
 
 Run it forever with launchd (macOS) or systemd (Linux). Sample launchd plist:
 
